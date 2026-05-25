@@ -106,6 +106,12 @@ public class TradeManager {
     }
 
     public static void sendTradeRequest(Player senderPlayer, Player targetPlayer) {
+        // 检查目标玩家是否接受交易请求
+        if (!GoodsTrade.playerDataManager.isTradeAccept(targetPlayer.getUniqueId())) {
+            senderPlayer.sendMessage(GoodsTrade.PREFIX + "§c该玩家已关闭交易接受，无法向其发起交易");
+            return;
+        }
+
         if (isInCooldown(senderPlayer, targetPlayer)) {
 //            long remainingSeconds = getRemainingCooldownSeconds(senderPlayer, targetPlayer);
             senderPlayer.sendMessage(GoodsTrade.PREFIX + "§c发起交易过于频繁，请等待一会再重试");
@@ -168,6 +174,9 @@ public class TradeManager {
 //        return requests == null ? Collections.emptyList() : requests;
 //    }
 
+    /**
+     * 清理过期的请求
+     */
     public static void cleanupExpiredRequests() {
         Iterator<Map.Entry<UUID, List<TradeRequest>>> iterator = pendingRequests.entrySet().iterator();
 

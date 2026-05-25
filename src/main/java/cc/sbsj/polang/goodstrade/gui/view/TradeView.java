@@ -15,7 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
     ~~~~@~~~~
     ~~~~@~~~~
     ~~~~@~~~~
@@ -42,7 +42,7 @@ public class TradeView extends View {
     public void open(Player sender, Player target) {
         // 创建交易会话
         session = TradeManager.createSession(sender, target, this);
-        // 创建 GUI 界面
+        // 创建 GUI 界面，使用玩家名称作为标题
         gui = new Gui(sender, Utils.createTwoPlayerTitle(sender.getName(), target.getName()), 6);
         //添加背景格
         gui.addAllBackGround();

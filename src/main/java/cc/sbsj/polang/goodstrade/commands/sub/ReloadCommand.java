@@ -14,11 +14,17 @@ import java.util.List;
 @SubCommandAnnotation(name = "reload")
 @SuppressWarnings("unused")
 public class ReloadCommand implements SubCommand {
-
+    @Override
+    public String getPermission() {
+        return "goodstrade.command.reload";
+    }
     @Override
     public boolean execute(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!sender.hasPermission("goodstrade.admin")) return false;
+        if (!sender.hasPermission(getPermission())) return false;
         GoodsTrade.config.reload();
+        // 重载时保存并重新加载玩家数据
+        GoodsTrade.playerDataManager.save();
+        GoodsTrade.playerDataManager.load();
         TradeManager.pendingRequests.clear();
         TradeManager.stopAllTrades();
         sender.sendMessage(GoodsTrade.PREFIX + "§a配置文件已重载！");

@@ -16,6 +16,10 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        name = "placeholderapi"
+        url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+    }
 }
 
 dependencies {
@@ -25,6 +29,7 @@ dependencies {
     compileOnly "org.projectlombok:lombok:1.18.30"
     annotationProcessor "org.projectlombok:lombok:1.18.30"
     implementation("com.github.cryptomorin:XSeries:13.6.0")
+    compileOnly "me.clip:placeholderapi:2.11.6"
 }
 
 def targetJavaVersion = 8

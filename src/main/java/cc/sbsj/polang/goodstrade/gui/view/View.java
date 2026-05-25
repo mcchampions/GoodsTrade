@@ -11,6 +11,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
+/**
+ * 界面的公共内容都塞这里
+ */
 public class View {
     public final static ItemStack air = new ItemStack(Material.AIR);
     public final static ItemStack backGround = new ItemStack(XMaterial.BLACK_STAINED_GLASS_PANE.parseItem());
@@ -137,17 +140,17 @@ public class View {
     }
 
     public boolean isBlackList(InventoryClickEvent event, Player player) {
-        if (GoodsTrade.config.isBlackList()) {
-            if (GoodsTrade.config.isTradeLoreToBlackList(player)) {
-                player.sendMessage(GoodsTrade.PREFIX + "§c你的物品槽有禁止交易的物品！");
-                event.setCancelled(true);
-                return true;
-            }
-            if (GoodsTrade.config.isTradeNameToBlackList(player)) {
-                player.sendMessage(GoodsTrade.PREFIX + "§c你的物品槽有禁止交易的物品！");
-                event.setCancelled(true);
-                return true;
-            }
+        if (!GoodsTrade.config.isBlackList()) return false;
+
+        if (GoodsTrade.config.isTradeLoreToBlackList(player)) {
+            player.sendMessage(GoodsTrade.PREFIX + "§c你的物品槽有禁止交易的物品！");
+            event.setCancelled(true);
+            return true;
+        }
+        if (GoodsTrade.config.isTradeNameToBlackList(player)) {
+            player.sendMessage(GoodsTrade.PREFIX + "§c你的物品槽有禁止交易的物品！");
+            event.setCancelled(true);
+            return true;
         }
         return false;
     }

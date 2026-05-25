@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 @Getter
 @Setter
-//交易状态类
+//交易状态类，记录当前交易的双方及进度
 public class TradeSession {
     private Player senderPlayer;
     private Player targetPlayer;

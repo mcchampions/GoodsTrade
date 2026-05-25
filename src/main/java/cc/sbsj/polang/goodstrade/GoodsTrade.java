@@ -2,9 +2,14 @@ package cc.sbsj.polang.goodstrade;
 
 import cc.sbsj.polang.goodstrade.commands.GoodsTradeCommand;
 import cc.sbsj.polang.goodstrade.config.Config;
+import cc.sbsj.polang.goodstrade.config.PlayerDataManager;
 import cc.sbsj.polang.goodstrade.hook.Metrics;
+import cc.sbsj.polang.goodstrade.hook.Papi;
 import cc.sbsj.polang.goodstrade.task.RunTask;
 import cc.sbsj.polang.goodstrade.trade.TradeManager;
+import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GoodsTrade extends JavaPlugin {
@@ -12,12 +17,22 @@ public final class GoodsTrade extends JavaPlugin {
     public static GoodsTrade instance;
     public Metrics metrics;
     public static Config config;
-
+    public static PlayerDataManager playerDataManager;
+    public static boolean pluginEnabled;
     @Override
     public void onEnable() {
         instance = this;
+        if (checkDependencies())
+        {
+            pluginEnabled = true;
+        } else {
+            pluginEnabled = false;
+            getLogger().severe("§c为了阻止可能出现的错误，插件停止加载功能");
+            return;
+        }
         config = new Config(this);
-        metrics = new Metrics(this, 30110);
+        playerDataManager = new PlayerDataManager(this);
+
         getLogger().info(PREFIX + "§3插件版本: §bv" + this.getDescription().getVersion());
         getLogger().info(PREFIX + "§3插件功能: §e" + this.getDescription().getDescription());
 
@@ -31,10 +46,48 @@ public final class GoodsTrade extends JavaPlugin {
         getLogger().info(PREFIX + "§a成功加载了喵~");
     }
 
+    private boolean checkDependencies() {
+
+        try {
+            Material test = XMaterial.STONE.get();
+            if (test == null) {
+                getLogger().warning("§cXSeries 解析物品失败！请确保 XSeries 已正确打包进插件 jar。");
+                return false;
+            } else {
+                getLogger().info("§2依赖库 XSeries 加载正常");
+            }
+        } catch (NoClassDefFoundError e) {
+            getLogger().severe("§c致命错误：找不到 XSeries 类！插件将无法正常工作。");
+            getLogger().severe("§c请检查 build.gradle 中是否正确配置了 shadowJar 任务来重定位并打包 XSeries。");
+            return false;
+        } catch (Exception e) {
+            getLogger().warning("§cXSeries 初始化异常: " + e.getMessage());
+            return false;
+        }
+
+        // Hook PlaceholderAPI
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new Papi(this).register();
+            getLogger().info("§2PlaceholderAPI 变量已注册");
+        } else {
+            getLogger().info("§7未检测到 PlaceholderAPI，有关变量功能将无法使用");
+        }
+
+        metrics = new Metrics(this, 30110);
+        return true;
+    }
+
     @Override
     public void onDisable() {
-        TradeManager.stopAllTrades();
-        metrics.shutdown();
-        getLogger().info("§a插件卸载了喵~");
+        if (pluginEnabled)
+        {
+            TradeManager.stopAllTrades();
+            // 保存玩家数据到文件
+            if (playerDataManager != null) {
+                playerDataManager.save();
+            }
+            metrics.shutdown();
+            getLogger().info("§a插件卸载了喵~");
+        }
     }
 }

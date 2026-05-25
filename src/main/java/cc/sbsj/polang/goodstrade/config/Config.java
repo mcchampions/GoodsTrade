@@ -12,11 +12,9 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class Config {
-    public Configuration config;
-    public GoodsTrade plugin;
+    private Configuration config;
 
     public Config(GoodsTrade plugin) {
-        this.plugin = plugin;
         config = plugin.getConfig();
         plugin.saveDefaultConfig();
     }
@@ -31,10 +29,8 @@ public class Config {
     }
 
     public void reload() {
-        plugin.reloadConfig();
-        config = plugin.getConfig();
-
-
+        GoodsTrade.instance.reloadConfig();
+        config = GoodsTrade.instance.getConfig();
     }
 
     public boolean isEnabledShiftClick() {

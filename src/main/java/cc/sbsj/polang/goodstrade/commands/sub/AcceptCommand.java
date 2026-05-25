@@ -18,13 +18,17 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class AcceptCommand implements SubCommand {
     @Override
+    public String getPermission() {
+        return "goodstrade.command.accept";
+    }
+    @Override
     public boolean execute(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!sender.hasPermission(getPermission())) return false;
         if (args.length == 0) {
             Player player = (Player) sender;
 
             List<TradeRequest> requests = TradeManager.pendingRequests.get(player.getUniqueId());
-            if (requests.isEmpty()) return false;
-
+            if (requests == null || requests.isEmpty()) return false;
             int acceptCount = requests.size();
             if (acceptCount == 1) {
                 TradeRequest request = requests.get(0);

@@ -17,10 +17,13 @@ import java.util.List;
 @SubCommandAnnotation(name = "trade")
 @SuppressWarnings("unused")
 public class TradeCommand implements SubCommand {
-
+    @Override
+    public String getPermission() {
+        return "goodstrade.command.trade";
+    }
     @Override
     public boolean execute(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!sender.hasPermission("goodstrade.admin")) return false;
+        if (!sender.hasPermission(getPermission())) return false;
         if (args.length == 0) {
             sender.sendMessage(GoodsTrade.PREFIX + "§a用法：/gt trade [接收人] [发起人]");
             return false;
@@ -30,7 +33,7 @@ public class TradeCommand implements SubCommand {
             return false;
         }
         if (args.length == 2) {
-            if (!sender.hasPermission("goodstrade.admin")) return false;
+            if (!sender.hasPermission(getPermission())) return false;
             //发起人
             Player player = Bukkit.getPlayerExact(args[0]);
             if (player == null) {

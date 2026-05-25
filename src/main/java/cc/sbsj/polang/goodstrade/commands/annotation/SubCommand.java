@@ -14,6 +14,7 @@ public interface SubCommand {
         }
         throw new IllegalStateException("子命令实现必须重写getName()方法或使用@SubCommandAnnotation注解");
     }
+    String getPermission();
 
     boolean execute(CommandSender sender, Command cmd, String label, String[] args);
 
