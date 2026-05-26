@@ -60,6 +60,7 @@ public class TradeManager {
     //完整的取消交易
     public static void cancelTrade(Player player) {
         TradeSession session = TradeManager.getSession(player);
+        if (session == null) return;
 
         Player sender = session.getSenderPlayer();
         session.getView().backPlayerItems(sender);
@@ -72,13 +73,13 @@ public class TradeManager {
             player.sendMessage(GoodsTrade.PREFIX + "你取消了交易！");
             target.sendMessage(GoodsTrade.PREFIX + "对方取消了交易！");
             TradeManager.removeSession(player);
-            target.closeInventory();
+            target.closeInventory(PLUGIN);
         } else {
             //被发起者结束交易
             player.sendMessage(GoodsTrade.PREFIX + "你取消了交易！");
             sender.sendMessage(GoodsTrade.PREFIX + "对方取消了交易！");
             TradeManager.removeSession(player);
-            sender.closeInventory();
+            sender.closeInventory(PLUGIN);
         }
     }
 
@@ -88,7 +89,7 @@ public class TradeManager {
         Player target = session.getTargetPlayer();
         TradeManager.removeSession(target);
         //必须先移除交易会话再关闭界面
-        target.closeInventory();
+        target.closeInventory(PLUGIN);
     }
 
     public static void startTrade(Player senderPlayer, Player targetPlayer) {
@@ -199,23 +200,23 @@ public class TradeManager {
         if (sessions.isEmpty()) return;
 
         // 复制一份避免并发修改异常
-//        List<TradeSession> sessionList = new ArrayList<>(sessions.values());
+        List<TradeSession> sessionList = new ArrayList<>(sessions.values());
 
-        for (TradeSession session : sessions.values()) {
+        for (TradeSession session : sessionList) {
             try {
                 Player sender = session.getSenderPlayer();
                 Player target = session.getTargetPlayer();
-                // 检查玩家是否在线
-                if (sender != null && target != null) {
-                    if (session.getView().runnable != null) session.getView().runnable.cancel();
-                    sender.closeInventory(PLUGIN);
-                    session.getView().backPlayerItems(sender); // 返还物品
-                    sender.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
-                    target.closeInventory(PLUGIN);
-                    session.getView().backPlayerItems(target); // 返还物品
-                    target.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
+                if (session.getView().runnable != null) session.getView().runnable.cancel();
 
-                    TradeManager.removeSession(sender);
+                if (sender != null) {
+                    session.getView().backPlayerItems(sender);
+                    sender.closeInventory(PLUGIN);
+                    sender.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
+                }
+                if (target != null) {
+                    session.getView().backPlayerItems(target);
+                    target.closeInventory(PLUGIN);
+                    target.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
                 }
             } catch (Exception e) {
                 GoodsTrade.instance.getLogger().warning("关闭交易时发生错误：" + e.getMessage());

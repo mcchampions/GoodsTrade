@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import static org.bukkit.event.inventory.InventoryCloseEvent.Reason.PLUGIN;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -235,10 +237,6 @@ public class TradeView extends View {
                     //开始交易
                     session.setConfirmed(true);
                     executeTrade(session);
-
-                    session.getSenderPlayer().playSound(session.getSenderPlayer().getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 1.0f, 1.5f);
-                    session.getTargetPlayer().playSound(session.getTargetPlayer().getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 1.0f, 1.5f);
-
                     cancel();
                 } else {
                     //等待
@@ -263,10 +261,27 @@ public class TradeView extends View {
     public void executeTrade(TradeSession session) {
         Player sender = session.getSenderPlayer();
         Player receiver = session.getTargetPlayer();
+
+        // 交换交易物品
         addPlayerTradeItems(sender);
         addPlayerTradeItems(receiver);
+
+        // 重置交易状态
         session.setSenderReady(false);
-        sender.closeInventory();
+        session.setTargetReady(false);
+        session.setConfirmed(true);
+
+        // 交易成功提示（在关闭界面前发送，确保玩家能看到）
+        sender.sendMessage(GoodsTrade.PREFIX + "§a交易成功！");
+        receiver.sendMessage(GoodsTrade.PREFIX + "§a交易成功！");
+        sender.playSound(sender.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 1.0f, 1.5f);
+        receiver.playSound(receiver.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 1.0f, 1.5f);
+
+        // 先移除会话，再关闭界面，防止 onInventoryClose 重复处理
+        // 光标物品由 Bukkit closeInventory 内部自动返还，无需手动处理
+        TradeManager.removeSession(sender);
+        sender.closeInventory(PLUGIN);
+        receiver.closeInventory(PLUGIN);
     }
 
     //给玩家Gui上的物品

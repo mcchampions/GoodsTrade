@@ -41,6 +41,7 @@ public class Events implements Listener {
         if (!(event.getInventory().getHolder() instanceof Gui)) return;
 
         TradeSession session = TradeManager.getSession(player);
+        if (session == null) return;
         if (session.bothReady() && !View.readySlots.contains(event.getRawSlot())) {
             session.getSenderPlayer().sendMessage("§c正在交易确认中，若需取消请按取消按钮！");
             event.setCancelled(true);
@@ -88,6 +89,7 @@ public class Events implements Listener {
         if (!(event.getInventory().getHolder() instanceof Gui)) return;
         Player player = (Player) event.getWhoClicked();
         TradeSession session = TradeManager.getSession(player);
+        if (session == null) return;
         Player sender = session.getSenderPlayer();
         Player target = session.getTargetPlayer();
         if (player == sender) {
@@ -130,34 +132,34 @@ public class Events implements Listener {
         if (event.getInventory().getHolder() == null) return;
         if (!(event.getInventory().getHolder() instanceof Gui)) return;
         Player player = (Player) event.getPlayer();
-        //返还手里物品
-        ItemStack cursorItem = player.getOpenInventory().getCursor();
-        if (Utils.isItemStackNotEmpty(cursorItem)) {
-            Utils.addItems(player, cursorItem);
-        }
+
+//        //不处理返还了，让 bukkit 自动处理）
+//        ItemStack cursorItem = player.getOpenInventory().getCursor();
+//        if (Utils.isItemStackNotEmpty(cursorItem)) {
+//            Utils.addItems(player, cursorItem);
+//        }
+
+        //交易已完成或已取消/物品已由调用方处理，直接返回
         if (event.getReason() == InventoryCloseEvent.Reason.PLUGIN) {
             return;
         }
-        //该玩家是否正在交易
+
+        // 该玩家是否正在交易
         if (!TradeManager.isTrade(player)) return;
         TradeSession session = TradeManager.getSession(player);
         if (session == null) return;
-        //俩人都确认并且没完成，有人提前想结束
-        if (session.bothReady() && !session.isConfirmed()) {
-            //取消倒计时
-            session.getView().runnable.cancel();
-            //取消交易
-            TradeManager.cancelTrade(player);
-        } else {
-            if (session.isConfirmed()) {
-                //已经结束的关闭界面
-                TradeManager.cancelTrade(session);
-            } else {
-                //正在交易但关闭界面视为提前结束
-                TradeManager.cancelTrade(player);
-            }
-        }
 
+        if (session.bothReady() && !session.isConfirmed()) {
+            // 倒计时中关闭 → 取消倒计时，取消交易，通知双方
+            session.getView().runnable.cancel();
+            TradeManager.cancelTrade(player);
+        } else if (session.isConfirmed()) {
+            // 交易已完成的边界情况
+            TradeManager.cancelTrade(session);
+        } else {
+            // 双方未确认但有一方提前结束
+            TradeManager.cancelTrade(player);
+        }
     }
 
     private static final Map<UUID, Long> interactCooldown = Collections.synchronizedMap(new ConcurrentHashMap<>());
