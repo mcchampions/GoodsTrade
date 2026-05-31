@@ -2,11 +2,13 @@ package cc.sbsj.polang.goodstrade.trade;
 
 import cc.sbsj.polang.goodstrade.GoodsTrade;
 import cc.sbsj.polang.goodstrade.gui.view.TradeView;
+import cc.sbsj.polang.goodstrade.util.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -73,12 +75,15 @@ public class TradeManager {
             player.sendMessage(GoodsTrade.PREFIX + "你取消了交易！");
             target.sendMessage(GoodsTrade.PREFIX + "对方取消了交易！");
             TradeManager.removeSession(player);
+            // 手动处理光标物品后清空，防止 Bukkit closeInventory 内部重复返还
+            returnCursorItem(target);
             target.closeInventory(PLUGIN);
         } else {
             //被发起者结束交易
             player.sendMessage(GoodsTrade.PREFIX + "你取消了交易！");
             sender.sendMessage(GoodsTrade.PREFIX + "对方取消了交易！");
             TradeManager.removeSession(player);
+            returnCursorItem(sender);
             sender.closeInventory(PLUGIN);
         }
     }
@@ -89,7 +94,19 @@ public class TradeManager {
         Player target = session.getTargetPlayer();
         TradeManager.removeSession(target);
         //必须先移除交易会话再关闭界面
+        returnCursorItem(target);
         target.closeInventory(PLUGIN);
+    }
+
+    /**
+     * 手动将光标物品放入玩家背包并清空光标，防止 closeInventory 内部重复返还
+     */
+    private static void returnCursorItem(Player player) {
+        ItemStack cursor = player.getOpenInventory().getCursor();
+        if (Utils.isItemStackNotEmpty(cursor)) {
+            Utils.addItems(player, cursor);
+        }
+        player.setItemOnCursor(null);
     }
 
     public static void startTrade(Player senderPlayer, Player targetPlayer) {
@@ -210,11 +227,13 @@ public class TradeManager {
 
                 if (sender != null) {
                     session.getView().backPlayerItems(sender);
+                    returnCursorItem(sender);
                     sender.closeInventory(PLUGIN);
                     sender.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
                 }
                 if (target != null) {
                     session.getView().backPlayerItems(target);
+                    returnCursorItem(target);
                     target.closeInventory(PLUGIN);
                     target.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
                 }

@@ -16,26 +16,30 @@ import java.util.*;
  */
 public class View {
     public final static ItemStack air = new ItemStack(Material.AIR);
-    public final static ItemStack backGround = new ItemStack(XMaterial.BLACK_STAINED_GLASS_PANE.parseItem());
+    public static ItemStack backGround = XMaterial.BLACK_STAINED_GLASS_PANE.parseItem();
 
-    public static ItemStack readyButtonItem = new ItemStack(XMaterial.RED_STAINED_GLASS_PANE.parseItem());
-    public static ItemStack readyButtonItemYes = new ItemStack(XMaterial.GREEN_STAINED_GLASS_PANE.parseItem());
-    public static ItemStack readyButtonItemWait = new ItemStack(XMaterial.BLUE_STAINED_GLASS_PANE.parseItem());
+    public static ItemStack senderReadyButtonItem = XMaterial.RED_STAINED_GLASS_PANE.parseItem();
+    public static ItemStack senderReadyButtonItemYes = XMaterial.GREEN_STAINED_GLASS_PANE.parseItem();
+    public static ItemStack senderReadyButtonItemWait = XMaterial.BLUE_STAINED_GLASS_PANE.parseItem();
 
-    public static ItemStack cancelReadyItem = new ItemStack(XMaterial.YELLOW_STAINED_GLASS_PANE.parseItem());
-    public static ItemStack infoItem = new ItemStack(XMaterial.IRON_BARS.parseItem());
+    public static ItemStack targetReadyButtonItem = XMaterial.RED_STAINED_GLASS_PANE.parseItem();
+    public static ItemStack targetReadyButtonItemYes = XMaterial.GREEN_STAINED_GLASS_PANE.parseItem();
+    public static ItemStack targetReadyButtonItemWait = XMaterial.BLUE_STAINED_GLASS_PANE.parseItem();
+
+    public static ItemStack cancelReadyItem = XMaterial.YELLOW_STAINED_GLASS_PANE.parseItem();
+    public static ItemStack infoItem = XMaterial.IRON_BARS.parseItem();
 
 
-    public final GuiButton senderReadyButton = new GuiButton(readyButtonItem);
-    public final GuiButton senderReadyButtonYes = new GuiButton(readyButtonItemYes);
-    public final GuiButton senderReadyButtonWait = new GuiButton(readyButtonItemWait);
+    public final GuiButton senderReadyButton = new GuiButton(senderReadyButtonItem.clone());
+    public final GuiButton senderReadyButtonYes = new GuiButton(senderReadyButtonItemYes.clone());
+    public final GuiButton senderReadyButtonWait = new GuiButton(senderReadyButtonItemWait.clone());
 
-    public final GuiButton targetReadyButton = new GuiButton(readyButtonItem);
-    public final GuiButton targetReadyButtonYes = new GuiButton(readyButtonItemYes);
-    public final GuiButton targetReadyButtonWait = new GuiButton(readyButtonItemWait);
+    public final GuiButton targetReadyButton = new GuiButton(targetReadyButtonItem.clone());
+    public final GuiButton targetReadyButtonYes = new GuiButton(targetReadyButtonItemYes.clone());
+    public final GuiButton targetReadyButtonWait = new GuiButton(targetReadyButtonItemWait.clone());
 
-    public final GuiButton cancelReadyButton = new GuiButton(cancelReadyItem);
-    public final GuiButton infoButton = new GuiButton(infoItem);
+    public final GuiButton cancelReadyButton = new GuiButton(cancelReadyItem.clone());
+    public final GuiButton infoButton = new GuiButton(infoItem.clone());
 
 
     public static final List<Integer> senderTradeSlots = new ArrayList<>();
@@ -45,10 +49,27 @@ public class View {
 
     static {
         defaultTradingSlots();
+        resetDefaultItems();
+    }
+
+    public static void resetDefaultItems() {
+        backGround = XMaterial.BLACK_STAINED_GLASS_PANE.parseItem();
+        senderReadyButtonItem = XMaterial.RED_STAINED_GLASS_PANE.parseItem();
+        senderReadyButtonItemYes = XMaterial.GREEN_STAINED_GLASS_PANE.parseItem();
+        senderReadyButtonItemWait = XMaterial.BLUE_STAINED_GLASS_PANE.parseItem();
+        targetReadyButtonItem = XMaterial.RED_STAINED_GLASS_PANE.parseItem();
+        targetReadyButtonItemYes = XMaterial.GREEN_STAINED_GLASS_PANE.parseItem();
+        targetReadyButtonItemWait = XMaterial.BLUE_STAINED_GLASS_PANE.parseItem();
+        cancelReadyItem = XMaterial.YELLOW_STAINED_GLASS_PANE.parseItem();
+        infoItem = XMaterial.IRON_BARS.parseItem();
+
         defaultItemBackGround();
         defaultItemReady();
         defaultItemReadyYes();
         defaultItemReadyWait();
+        defaultTargetItemReady();
+        defaultTargetItemReadyYes();
+        defaultTargetItemReadyWait();
         defaultItemCancelReady();
         defaultItemInfo();
     }
@@ -94,27 +115,51 @@ public class View {
     }
 
     public static void defaultItemReady() {
-        ItemMeta meta = readyButtonItem.getItemMeta();
+        ItemMeta meta = senderReadyButtonItem.getItemMeta();
         meta.setDisplayName("§7当前未确认");
         List<String> lore = Arrays.asList("", "§a单击可确认");
         meta.setLore(lore);
-        readyButtonItem.setItemMeta(meta);
+        senderReadyButtonItem.setItemMeta(meta);
     }
 
     public static void defaultItemReadyYes() {
-        ItemMeta meta = readyButtonItemYes.getItemMeta();
+        ItemMeta meta = senderReadyButtonItemYes.getItemMeta();
         meta.setDisplayName("§e已确认");
         List<String> lore = Arrays.asList("", "§a等待对方确认");
         meta.setLore(lore);
-        readyButtonItemYes.setItemMeta(meta);
+        senderReadyButtonItemYes.setItemMeta(meta);
     }
 
     public static void defaultItemReadyWait() {
-        ItemMeta meta = readyButtonItemWait.getItemMeta();
+        ItemMeta meta = senderReadyButtonItemWait.getItemMeta();
         meta.setDisplayName("§b确认交易中...");
         List<String> lore = Arrays.asList("", "§e可检查对方物品是否符合要求", "§6若存在问题请再次点击以取消确认！");
         meta.setLore(lore);
-        readyButtonItemWait.setItemMeta(meta);
+        senderReadyButtonItemWait.setItemMeta(meta);
+    }
+
+    public static void defaultTargetItemReady() {
+        ItemMeta meta = targetReadyButtonItem.getItemMeta();
+        meta.setDisplayName("§7当前未确认");
+        List<String> lore = Arrays.asList("", "§a单击可确认");
+        meta.setLore(lore);
+        targetReadyButtonItem.setItemMeta(meta);
+    }
+
+    public static void defaultTargetItemReadyYes() {
+        ItemMeta meta = targetReadyButtonItemYes.getItemMeta();
+        meta.setDisplayName("§e已确认");
+        List<String> lore = Arrays.asList("", "§a等待对方确认");
+        meta.setLore(lore);
+        targetReadyButtonItemYes.setItemMeta(meta);
+    }
+
+    public static void defaultTargetItemReadyWait() {
+        ItemMeta meta = targetReadyButtonItemWait.getItemMeta();
+        meta.setDisplayName("§b确认交易中...");
+        List<String> lore = Arrays.asList("", "§e可检查对方物品是否符合要求", "§6若存在问题请再次点击以取消确认！");
+        meta.setLore(lore);
+        targetReadyButtonItemWait.setItemMeta(meta);
     }
 
     public static void defaultItemCancelReady() {

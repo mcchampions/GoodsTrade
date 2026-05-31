@@ -17,6 +17,7 @@ public class Config {
     public Config(GoodsTrade plugin) {
         config = plugin.getConfig();
         plugin.saveDefaultConfig();
+        ViewConfig.load(plugin);
     }
 
     public int getWaitTime() {
@@ -31,6 +32,7 @@ public class Config {
     public void reload() {
         GoodsTrade.instance.reloadConfig();
         config = GoodsTrade.instance.getConfig();
+        ViewConfig.load(GoodsTrade.instance);
     }
 
     public boolean isEnabledShiftClick() {

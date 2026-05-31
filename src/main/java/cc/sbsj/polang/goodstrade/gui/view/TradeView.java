@@ -234,7 +234,8 @@ public class TradeView extends View {
             @Override
             public void run() {
                 if (count == 0) {
-                    //开始交易
+                    // 防止交易已被取消后仍然执行
+                    if (!TradeManager.isTrade(session.getSenderPlayer())) return;
                     session.setConfirmed(true);
                     executeTrade(session);
                     cancel();
@@ -278,10 +279,24 @@ public class TradeView extends View {
         receiver.playSound(receiver.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 1.0f, 1.5f);
 
         // 先移除会话，再关闭界面，防止 onInventoryClose 重复处理
-        // 光标物品由 Bukkit closeInventory 内部自动返还，无需手动处理
         TradeManager.removeSession(sender);
+
+        // 手动处理光标物品后清空光标，防止 Bukkit closeInventory 内部自动返还导致重复
+        returnCursorItem(sender);
         sender.closeInventory(PLUGIN);
+        returnCursorItem(receiver);
         receiver.closeInventory(PLUGIN);
+    }
+
+    /**
+     * 手动将光标物品放入玩家背包并清空光标，防止 closeInventory 内部重复返还
+     */
+    private void returnCursorItem(Player player) {
+        ItemStack cursor = player.getOpenInventory().getCursor();
+        if (Utils.isItemStackNotEmpty(cursor)) {
+            Utils.addItems(player, cursor);
+        }
+        player.setItemOnCursor(null);
     }
 
     //给玩家Gui上的物品

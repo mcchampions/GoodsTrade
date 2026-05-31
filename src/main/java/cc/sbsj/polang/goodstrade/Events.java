@@ -4,7 +4,6 @@ import cc.sbsj.polang.goodstrade.gui.Gui;
 import cc.sbsj.polang.goodstrade.gui.view.View;
 import cc.sbsj.polang.goodstrade.trade.TradeManager;
 import cc.sbsj.polang.goodstrade.trade.TradeSession;
-import cc.sbsj.polang.goodstrade.util.Utils;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -17,7 +16,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 import java.util.Map;
@@ -133,13 +131,7 @@ public class Events implements Listener {
         if (!(event.getInventory().getHolder() instanceof Gui)) return;
         Player player = (Player) event.getPlayer();
 
-//        //不处理返还了，让 bukkit 自动处理）
-//        ItemStack cursorItem = player.getOpenInventory().getCursor();
-//        if (Utils.isItemStackNotEmpty(cursorItem)) {
-//            Utils.addItems(player, cursorItem);
-//        }
-
-        //交易已完成或已取消/物品已由调用方处理，直接返回
+        // 交易已完成或已取消，物品已由调用方处理，直接返回
         if (event.getReason() == InventoryCloseEvent.Reason.PLUGIN) {
             return;
         }

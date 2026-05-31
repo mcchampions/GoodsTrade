@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'cc.sbsj.polang'
-version = '1.0.7'
+version = '1.0.9'
 
 repositories {
     mavenCentral()
@@ -60,6 +60,7 @@ processResources {
 }
 tasks {
     shadowJar {
+        archiveClassifier.set('lite')
         relocate("com.cryptomorin.xseries", "cc.sbsj.polang.goodstrade.util")
     }
 }
