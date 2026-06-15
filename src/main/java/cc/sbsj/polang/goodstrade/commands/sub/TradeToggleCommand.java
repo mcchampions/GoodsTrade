@@ -29,7 +29,7 @@ public class TradeToggleCommand implements SubCommand {
     public boolean execute(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission(getPermission())) return false;
         if (!(sender instanceof Player)) {
-            sender.sendMessage(GoodsTrade.PREFIX + "§c该命令只能由玩家执行");
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.player-only"));
             return false;
         }
 
@@ -53,21 +53,21 @@ public class TradeToggleCommand implements SubCommand {
                 sendToggleMessage(player, false);
                 return true;
             } else {
-                player.sendMessage(GoodsTrade.PREFIX + "§c用法：/gt toggle [true|false]");
-                player.sendMessage(GoodsTrade.PREFIX + "§7不填参数则切换当前状态");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.usage.toggle"));
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.usage.toggle-hint"));
                 return false;
             }
         }
 
-        player.sendMessage(GoodsTrade.PREFIX + "§c用法：/gt toggle [on|off]");
+        player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.usage.toggle"));
         return false;
     }
 
     private void sendToggleMessage(Player player, boolean state) {
         if (state) {
-            player.sendMessage(GoodsTrade.PREFIX + "§a你已 §2开启 §a交易接受状态，其他玩家可以向你发起交易");
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-toggle.enabled"));
         } else {
-            player.sendMessage(GoodsTrade.PREFIX + "§c你已 §4关闭 §c交易接受状态，其他玩家无法向你发起交易");
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-toggle.disabled"));
         }
     }
 

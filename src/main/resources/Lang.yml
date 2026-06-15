@@ -1,0 +1,81 @@
+# GoodsTrade 多语言配置文件
+# 支持 & 颜色代码
+# 占位符说明:
+#   %prefix% - 插件前缀
+#   %player% - 玩家名称
+#   %target% - 目标玩家名称
+
+# 插件前缀
+prefix: "&7[&2&lGoods&6&lTrade&7] &r"
+
+# 命令相关
+command:
+  help: "&7可输入以下命令."
+  unknown: "&c未知的子命令."
+  no-permission: "&c你没有权限执行此命令！"
+  player-only: "&c该命令只能由玩家执行"
+  usage:
+    trade: "&a用法：/gt trade [接收人] [发起人]"
+    sendtrade: "&a用法：/gt sendtrade [接收人]"
+    toggle: "&c用法：/gt toggle [true|false]"
+    toggle-hint: "&7不填参数则切换当前状态"
+
+# 交易请求相关
+trade-request:
+  sent: "&7已向玩家 &e%target% &7发起交易"
+  received: "&7玩家 &e%player% &7向你发起交易 &a[点击接受]"
+  hover: "点击可确认"
+  cooldown: "&c发起交易过于频繁，请等待一会再重试"
+  target-closed: "&c该玩家已关闭交易接受，无法向其发起交易"
+  no-pending: "&c你当前没有交易请求！"
+  select-player: "&c请选择一个玩家"
+
+# 交易状态
+trade-status:
+  opening: "&2正在为您打开交易界面"
+  success: "&a交易成功！"
+  cancelled-by-self: "你取消了交易！"
+  cancelled-by-other: "对方取消了交易！"
+  cancelled-by-reload: "&c功能重载中，交易已取消"
+
+# 交易界面
+trade-gui:
+  confirm: "&a你已确认交易，等待对方确认..."
+  unconfirm: "&c你已取消确认交易"
+  cancel-ready: "&c你已取消确认状态"
+  trade-cancelled: "&c交易已取消，回到初始状态"
+  items-locked: "&c你已确认，物品状态锁定！"
+  self-operation: "&c你只能操作自己的物品"
+  confirm-in-progress: "&c正在交易确认中，若需取消请按取消按钮！"
+  blacklist-hit: "&c你的物品槽有禁止交易的物品！"
+
+# 交易开关
+trade-toggle:
+  enabled: "&a你已 &2开启 &a交易接受状态，其他玩家可以向你发起交易"
+  disabled: "&c你已 &4关闭 &c交易接受状态，其他玩家无法向你发起交易"
+
+# 玩家相关
+player:
+  offline: "&c该玩家不在线"
+  not-found: "&c输入用户不存在或不在线"
+  self-trade: "&c你不能与自己进行交易！"
+  different-players: "&c交易必须两个不同玩家！"
+  inv-full: "&c你的背包已满！多余物品已丢出"
+
+# 控制台相关
+console:
+  need-both-players: "控制台必须输入发起人与被发起人"
+
+# 安全保护
+protection:
+  trading: "该玩家正在交易，你无法对其造成伤害"
+
+# 安全违规
+security:
+  exploit-attempt: "&c试图滥发消息被踢出！"
+
+
+
+# 重载
+reload:
+  success: "&a配置文件已重载！"

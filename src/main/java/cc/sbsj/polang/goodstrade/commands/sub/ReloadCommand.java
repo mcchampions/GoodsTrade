@@ -27,7 +27,7 @@ public class ReloadCommand implements SubCommand {
         GoodsTrade.playerDataManager.load();
         TradeManager.pendingRequests.clear();
         TradeManager.stopAllTrades();
-        sender.sendMessage(GoodsTrade.PREFIX + "§a配置文件已重载！");
+        sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("reload.success"));
 
         return true;
     }

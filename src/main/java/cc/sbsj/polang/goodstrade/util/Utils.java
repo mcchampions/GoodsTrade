@@ -21,7 +21,7 @@ public class Utils {
         for (Map.Entry<Integer, ItemStack> entry : excessItems.entrySet()) {
             player.getWorld().dropItem(player.getLocation(), entry.getValue());
         }
-        player.sendMessage(GoodsTrade.PREFIX + "§c你的背包已满！多余物品已丢出");
+        player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.inv-full"));
     }
 
     //有点难处理玩家ID过长情况，先不管了

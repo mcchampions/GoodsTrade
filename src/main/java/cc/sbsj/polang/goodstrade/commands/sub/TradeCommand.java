@@ -25,11 +25,11 @@ public class TradeCommand implements SubCommand {
     public boolean execute(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission(getPermission())) return false;
         if (args.length == 0) {
-            sender.sendMessage(GoodsTrade.PREFIX + "§a用法：/gt trade [接收人] [发起人]");
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.usage.trade"));
             return false;
         }
         if (args.length == 1) {
-            sender.sendMessage("控制台必须输入发起人与被发起人");
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("console.need-both-players"));
             return false;
         }
         if (args.length == 2) {
@@ -37,16 +37,16 @@ public class TradeCommand implements SubCommand {
             //发起人
             Player player = Bukkit.getPlayerExact(args[0]);
             if (player == null) {
-                sender.sendMessage(GoodsTrade.PREFIX + "§c发起人不在线！");
+                sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.offline"));
                 return false;
             }
             Player player2 = Bukkit.getPlayerExact(args[1]);
             if (player2 == null) {
-                sender.sendMessage(GoodsTrade.PREFIX + "§c被受邀者不在线");
+                sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.offline"));
                 return false;
             }
             if (player == player2) {
-                sender.sendMessage(GoodsTrade.PREFIX + "§c交易必须两个不同玩家！");
+                sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.different-players"));
                 return false;
             }
             TradeManager.startTrade(player, player2);

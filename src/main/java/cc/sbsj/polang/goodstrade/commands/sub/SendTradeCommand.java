@@ -26,25 +26,24 @@ public class SendTradeCommand implements SubCommand {
     public boolean execute(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission(getPermission())) return false;
         if (args.length == 0) {
-            sender.sendMessage(GoodsTrade.PREFIX + "§a用法：/gt sendtrade [接收人]");
-            sender.sendMessage(GoodsTrade.PREFIX + "§e发起人为可选参数,若不存在默认以输入命令者");
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.usage.sendtrade"));
             return false;
         }
         if (args.length == 1) {
             if (sender instanceof Player) {
                 Player player = Bukkit.getPlayerExact(args[0]);
                 if (player == null) {
-                    sender.sendMessage(GoodsTrade.PREFIX + "§c输入用户不存在或不在线");
+                    sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.not-found"));
                     return false;
                 }
                 if (player == sender) {
-                    sender.sendMessage(GoodsTrade.PREFIX + "§c你不能与自己进行交易！");
+                    sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.self-trade"));
                     return false;
                 }
                 TradeManager.sendTradeRequest((Player) sender, player);
                 return true;
             } else {
-                sender.sendMessage("控制台必须输入发起人与被发起人");
+                sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("console.need-both-players"));
                 return false;
             }
         }
@@ -53,7 +52,7 @@ public class SendTradeCommand implements SubCommand {
             Player player = Bukkit.getPlayerExact(args[0]);
             Player player2 = Bukkit.getPlayerExact(args[1]);
             if (player == null || player2 == null) {
-                sender.sendMessage(GoodsTrade.PREFIX + "§c输入用户不存在或不在线");
+                sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.not-found"));
                 return false;
             }
             TradeManager.sendTradeRequest(player, player2);

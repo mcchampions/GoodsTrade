@@ -34,19 +34,19 @@ public class AcceptCommand implements SubCommand {
                 TradeRequest request = requests.get(0);
                 Player targetPlayer = Bukkit.getPlayer(request.getSenderId());
                 if (targetPlayer == null) {
-                    player.sendMessage(GoodsTrade.PREFIX + "§c该玩家不在线");
+                    player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.offline"));
                     return false;
                 }
                 TradeManager.startTrade(targetPlayer, player);
                 return true;
             }
-            player.sendMessage(GoodsTrade.PREFIX + "§c请选择一个玩家");
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-request.select-player"));
             return false;
         }
         if (args.length == 1) {
             Player targetPlayer = Bukkit.getPlayerExact(args[0]);
             if (targetPlayer == null) {
-                sender.sendMessage(GoodsTrade.PREFIX + "§c该玩家不在线");
+                sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("player.offline"));
                 return false;
             }
             TradeManager.startTrade(targetPlayer, (Player) sender);

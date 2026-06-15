@@ -33,6 +33,7 @@ public class Config {
         GoodsTrade.instance.reloadConfig();
         config = GoodsTrade.instance.getConfig();
         ViewConfig.load(GoodsTrade.instance);
+        GoodsTrade.lang.load();
     }
 
     public boolean isEnabledShiftClick() {

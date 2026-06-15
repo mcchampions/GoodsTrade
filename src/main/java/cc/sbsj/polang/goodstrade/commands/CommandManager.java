@@ -24,9 +24,9 @@ public class CommandManager {
     }
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(GoodsTrade.PREFIX + "§7可输入以下命令:");
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.help"));
             for (SubCommand command : commands.values()) {
-                sender.sendMessage(GoodsTrade.PREFIX + "/GoodsTrade " + command.getName());
+                sender.sendMessage(GoodsTrade.getPrefix() + "/GoodsTrade " + command.getName());
             }
             return false;
         }
@@ -37,7 +37,7 @@ public class CommandManager {
             System.arraycopy(args, 1, subArgs, 0, args.length - 1);
             return subCommand.execute(sender, cmd, label, subArgs);
         } else {
-            sender.sendMessage(GoodsTrade.PREFIX + "§c未知的子命令.");
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.unknown"));
             return false;
         }
     }
@@ -71,12 +71,12 @@ public class CommandManager {
                         registerCommand(instance);
                         GoodsTrade.instance.getLogger().info("已注册子命令: " + clazz.getSimpleName());
                     } catch (Exception e) {
-                        GoodsTrade.instance.getLogger().warning(GoodsTrade.PREFIX + "无法实例化命令类: " + clazz.getName() + " - " + e.getMessage());
+                        GoodsTrade.instance.getLogger().warning(GoodsTrade.getPrefix() + "无法实例化命令类: " + clazz.getName() + " - " + e.getMessage());
                     }
                 }
             }
         } catch (Exception e) {
-            GoodsTrade.instance.getLogger().severe(GoodsTrade.PREFIX + "扫描命令类时出错: " + e.getMessage());
+            GoodsTrade.instance.getLogger().severe(GoodsTrade.getPrefix() + "扫描命令类时出错: " + e.getMessage());
         }
     }
 
@@ -96,7 +96,7 @@ public class CommandManager {
                     scanDirectory(new File(resource.getFile()), packageName, loader, classes);
                 }
             } catch (Exception e) {
-                GoodsTrade.instance.getLogger().severe(GoodsTrade.PREFIX + "扫描过程中发生错误: " + e.getMessage());
+                GoodsTrade.instance.getLogger().severe(GoodsTrade.getPrefix() + "扫描过程中发生错误: " + e.getMessage());
             }
         }
 
@@ -133,12 +133,12 @@ public class CommandManager {
                             try {
                                 classes.add(Class.forName(className, false, loader));
                             } catch (ClassNotFoundException e) {
-                                GoodsTrade.instance.getLogger().warning(GoodsTrade.PREFIX + "类未找到: " + className);
+                                GoodsTrade.instance.getLogger().warning(GoodsTrade.getPrefix() + "类未找到: " + className);
                             }
                         });
             }
         } catch (IOException e) {
-            GoodsTrade.instance.getLogger().severe(GoodsTrade.PREFIX + "JAR文件扫描错误: " + e.getMessage());
+            GoodsTrade.instance.getLogger().severe(GoodsTrade.getPrefix() + "JAR文件扫描错误: " + e.getMessage());
         }
     }
 
@@ -162,7 +162,7 @@ public class CommandManager {
                         try {
                             classes.add(Class.forName(className, false, loader));
                         } catch (ClassNotFoundException e) {
-                            GoodsTrade.instance.getLogger().warning(GoodsTrade.PREFIX + file.getName() + "扫描到 " + simpleName + " 子命令");
+                            GoodsTrade.instance.getLogger().warning(GoodsTrade.getPrefix() + file.getName() + "扫描到 " + simpleName + " 子命令");
                         }
                     }
                 }
@@ -172,7 +172,7 @@ public class CommandManager {
                 try {
                     classes.add(Class.forName(className, false, loader));
                 } catch (ClassNotFoundException e) {
-                    GoodsTrade.instance.getLogger().warning(GoodsTrade.PREFIX + "类未找到: " + className);
+                    GoodsTrade.instance.getLogger().warning(GoodsTrade.getPrefix() + "类未找到: " + className);
                 }
             }
         }

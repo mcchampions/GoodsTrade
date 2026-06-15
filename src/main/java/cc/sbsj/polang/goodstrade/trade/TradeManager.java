@@ -72,16 +72,16 @@ public class TradeManager {
 
         if (session.isPlayerSender(player)) {
             //发起者结束交易
-            player.sendMessage(GoodsTrade.PREFIX + "你取消了交易！");
-            target.sendMessage(GoodsTrade.PREFIX + "对方取消了交易！");
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-self"));
+            target.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-other"));
             TradeManager.removeSession(player);
             // 手动处理光标物品后清空，防止 Bukkit closeInventory 内部重复返还
             returnCursorItem(target);
             target.closeInventory(PLUGIN);
         } else {
             //被发起者结束交易
-            player.sendMessage(GoodsTrade.PREFIX + "你取消了交易！");
-            sender.sendMessage(GoodsTrade.PREFIX + "对方取消了交易！");
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-self"));
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-other"));
             TradeManager.removeSession(player);
             returnCursorItem(sender);
             sender.closeInventory(PLUGIN);
@@ -111,11 +111,11 @@ public class TradeManager {
 
     public static void startTrade(Player senderPlayer, Player targetPlayer) {
         if (!pendingRequests.containsKey(targetPlayer.getUniqueId())) {
-            targetPlayer.sendMessage(GoodsTrade.PREFIX + "§c你当前没有交易请求！");
+            targetPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-request.no-pending"));
             return;
         }
-        senderPlayer.sendMessage(GoodsTrade.PREFIX + "§2正在为您打开交易界面");
-        targetPlayer.sendMessage(GoodsTrade.PREFIX + "§2正在为您打开交易界面");
+        senderPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.opening"));
+        targetPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.opening"));
         //打开界面后移除他俩的交易请求
         pendingRequests.remove(senderPlayer.getUniqueId());
         pendingRequests.remove(targetPlayer.getUniqueId());
@@ -126,23 +126,31 @@ public class TradeManager {
     public static void sendTradeRequest(Player senderPlayer, Player targetPlayer) {
         // 检查目标玩家是否接受交易请求
         if (!GoodsTrade.playerDataManager.isTradeAccept(targetPlayer.getUniqueId())) {
-            senderPlayer.sendMessage(GoodsTrade.PREFIX + "§c该玩家已关闭交易接受，无法向其发起交易");
+            senderPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-request.target-closed"));
             return;
         }
 
         if (isInCooldown(senderPlayer, targetPlayer)) {
 //            long remainingSeconds = getRemainingCooldownSeconds(senderPlayer, targetPlayer);
-            senderPlayer.sendMessage(GoodsTrade.PREFIX + "§c发起交易过于频繁，请等待一会再重试");
+            senderPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-request.cooldown"));
             return;
         }
 
         addRequest(senderPlayer, targetPlayer);
 
-        BaseComponent component = new TextComponent(GoodsTrade.PREFIX + "§7玩家 §e" + senderPlayer.getName() + " §7向你发起交易 §a[点击接受]");
+        String receivedMsg = GoodsTrade.lang.replacePlaceholders(
+                GoodsTrade.lang.getString("trade-request.received"),
+                "%player%", senderPlayer.getName()
+        );
+        BaseComponent component = new TextComponent(GoodsTrade.getPrefix() + receivedMsg);
         component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/goodstrade accept " + senderPlayer.getName()));
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("点击可确认")));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(GoodsTrade.lang.getString("trade-request.hover"))));
         targetPlayer.sendMessage(component);
-        senderPlayer.sendMessage(GoodsTrade.PREFIX + "§7已向玩家 §e" + targetPlayer.getName() + " §7发起交易");
+        String sentMsg = GoodsTrade.lang.replacePlaceholders(
+                GoodsTrade.lang.getString("trade-request.sent"),
+                "%target%", targetPlayer.getName()
+        );
+        senderPlayer.sendMessage(GoodsTrade.getPrefix() + sentMsg);
     }
 
     private static void addRequest(Player sender, Player target) {
@@ -229,13 +237,13 @@ public class TradeManager {
                     session.getView().backPlayerItems(sender);
                     returnCursorItem(sender);
                     sender.closeInventory(PLUGIN);
-                    sender.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
+                    sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-reload"));
                 }
                 if (target != null) {
                     session.getView().backPlayerItems(target);
                     returnCursorItem(target);
                     target.closeInventory(PLUGIN);
-                    target.sendMessage(GoodsTrade.PREFIX + "§c功能重载中，交易已取消");
+                    target.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-reload"));
                 }
             } catch (Exception e) {
                 GoodsTrade.instance.getLogger().warning("关闭交易时发生错误：" + e.getMessage());

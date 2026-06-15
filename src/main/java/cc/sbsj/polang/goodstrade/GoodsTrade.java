@@ -2,6 +2,7 @@ package cc.sbsj.polang.goodstrade;
 
 import cc.sbsj.polang.goodstrade.commands.GoodsTradeCommand;
 import cc.sbsj.polang.goodstrade.config.Config;
+import cc.sbsj.polang.goodstrade.config.Lang;
 import cc.sbsj.polang.goodstrade.config.PlayerDataManager;
 import cc.sbsj.polang.goodstrade.hook.Metrics;
 import cc.sbsj.polang.goodstrade.hook.Papi;
@@ -13,10 +14,15 @@ import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GoodsTrade extends JavaPlugin {
-    public static final String PREFIX = "§7[§2§lGoods§6§lTrade§7] §r";
+    public static final String PREFIX_KEY = "prefix";
     public static GoodsTrade instance;
     public Metrics metrics;
     public static Config config;
+    public static Lang lang;
+    
+    public static String getPrefix() {
+        return lang.getString(PREFIX_KEY);
+    }
     public static PlayerDataManager playerDataManager;
     public static boolean pluginEnabled;
     @Override
@@ -30,11 +36,12 @@ public final class GoodsTrade extends JavaPlugin {
             getLogger().severe("§c为了阻止可能出现的错误，插件停止加载功能");
             return;
         }
+        lang = new Lang(this);
         config = new Config(this);
         playerDataManager = new PlayerDataManager(this);
 
-        getLogger().info(PREFIX + "§3插件版本: §bv" + this.getDescription().getVersion());
-        getLogger().info(PREFIX + "§3插件功能: §e" + this.getDescription().getDescription());
+        getLogger().info(getPrefix() + "§3插件版本: §bv" + this.getDescription().getVersion());
+        getLogger().info(getPrefix() + "§3插件功能: §e" + this.getDescription().getDescription());
 
         getCommand("goodstrade").setExecutor(new GoodsTradeCommand(this));
         getLogger().info("§2命令成功加载");
@@ -43,7 +50,7 @@ public final class GoodsTrade extends JavaPlugin {
         //每十分钟运行一次检查
         this.getServer().getScheduler().runTaskTimer(this, new RunTask(), 20L, 12000L);
 
-        getLogger().info(PREFIX + "§a成功加载了喵~");
+        getLogger().info(getPrefix() + "§a成功加载了喵~");
     }
 
     private boolean checkDependencies() {

@@ -33,12 +33,12 @@ public class GoodsTradeCommand implements SubCommand, CommandExecutor, TabComple
     public boolean execute(CommandSender sender, Command cmd, String label, String[] args) {
         if (!sender.hasPermission(getPermission())) return false;
         if (args.length == 0) {
-            sender.sendMessage(GoodsTrade.PREFIX + "§7可输入以下命令.");
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("command.help"));
             for (SubCommand command : subCommandManager.getCommands().values()) {
                 if (sender.hasPermission(command.getPermission()))
                 {
                     //只给玩家看他能看的命令
-                    sender.sendMessage(GoodsTrade.PREFIX + "/GoodsTrade " + command.getName());
+                    sender.sendMessage(GoodsTrade.getPrefix() + "/GoodsTrade " + command.getName());
                 }
             }
             return false;

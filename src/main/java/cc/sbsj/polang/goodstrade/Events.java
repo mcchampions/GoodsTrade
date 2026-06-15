@@ -41,7 +41,7 @@ public class Events implements Listener {
         TradeSession session = TradeManager.getSession(player);
         if (session == null) return;
         if (session.bothReady() && !View.readySlots.contains(event.getRawSlot())) {
-            session.getSenderPlayer().sendMessage("§c正在交易确认中，若需取消请按取消按钮！");
+            session.getSenderPlayer().sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.confirm-in-progress"));
             event.setCancelled(true);
             return;
         }
@@ -99,7 +99,7 @@ public class Events implements Listener {
                 } else if (View.isSenderTradeSlot(rawSlot)) {
                     if (session.isSenderReady()) {
                         event.setCancelled(true);
-                        sender.sendMessage("§c你已确认，物品状态锁定！");
+                        sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.items-locked"));
                         sender.playSound(sender.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1.0f, 1.0f);
                         return;
                     }
@@ -114,7 +114,7 @@ public class Events implements Listener {
                 } else if (View.isTargetTradeSlot(rawSlot)) {
                     if (session.isTargetReady()) {
                         event.setCancelled(true);
-                        target.sendMessage("§c你已确认，物品状态锁定！");
+                        target.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.items-locked"));
                         target.playSound(target.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1.0f, 1.0f);
                         return;
                     }
@@ -195,7 +195,7 @@ public class Events implements Listener {
             Player player = (Player) event.getSender();
             //主线程踢出
             Bukkit.getScheduler().runTask(GoodsTrade.instance, () -> {
-                Component kick = Component.text(GoodsTrade.PREFIX + "§c试图滥发消息被踢出！");
+                Component kick = Component.text(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("security.exploit-attempt"));
                 player.kick(kick);
             });
         }
@@ -223,7 +223,7 @@ public class Events implements Listener {
             Player player = (Player) event.getEntity();
             if (TradeManager.isTrade(player)) {
                 event.setCancelled(true);
-                event.getDamager().sendMessage("该玩家正在交易，你无法对其造成伤害");
+                event.getDamager().sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("protection.trading"));
                 return;
             }
         }

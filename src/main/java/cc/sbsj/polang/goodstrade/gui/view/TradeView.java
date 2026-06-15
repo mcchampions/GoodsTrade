@@ -73,7 +73,7 @@ public class TradeView extends View {
         button.setOnClick(event -> {
             Player user = (Player) event.getWhoClicked();
             if (!player.equals(user)) {
-                user.sendMessage("§c你只能操作自己的物品");
+                user.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.self-operation"));
                 user.playSound(user.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1.0f, 1.0f);
                 event.setCancelled(true);
                 return;
@@ -83,14 +83,14 @@ public class TradeView extends View {
             if (session.isPlayerSender(user)) {
                 if (session.isSenderReady()) {
                     event.setCancelled(true);
-                    user.sendMessage("§c你已确认，物品状态锁定！");
+                    user.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.items-locked"));
                     user.playSound(user.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1.0f, 1.0f);
                     return;
                 }
             } else {
                 if (session.isTargetReady()) {
                     event.setCancelled(true);
-                    user.sendMessage("§c你已确认，物品状态锁定！");
+                    user.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.items-locked"));
                     user.playSound(user.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1.0f, 1.0f);
                     return;
                 }
@@ -126,7 +126,7 @@ public class TradeView extends View {
                     prepareTrade(session);
                 }
                 //TODO
-                player.sendMessage("§a你已确认交易，等待对方确认...");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.confirm"));
             }
         });
         senderReadyButtonYes.setOnClick(event -> {
@@ -135,7 +135,7 @@ public class TradeView extends View {
                 session.setSenderReady(false);
                 changeButtons(senderReadyButton, 48, 47, 46);
                 //TODO
-                player.sendMessage("§c你已取消确认交易");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.unconfirm"));
 
             }
         });
@@ -154,7 +154,7 @@ public class TradeView extends View {
 
                 //记录是发送者取消的
                 cancelledPlayer = session.getTargetPlayer();
-                player.sendMessage("§c你已取消确认状态");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.cancel-ready"));
             }
         });
         targetReadyButton.setOnClick(event -> {
@@ -168,7 +168,7 @@ public class TradeView extends View {
                 if (session.bothReady()) {
                     prepareTrade(session);
                 }
-                player.sendMessage("§a你已确认交易，等待对方确认...");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.confirm"));
             }
         });
         targetReadyButtonYes.setOnClick(event -> {
@@ -176,7 +176,7 @@ public class TradeView extends View {
             if (player.equals(session.getTargetPlayer())) {
                 session.setTargetReady(false);
                 changeButtons(targetReadyButton, 50, 51, 52);
-                player.sendMessage("§c你已取消确认交易");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.unconfirm"));
             }
         });
 
@@ -197,7 +197,7 @@ public class TradeView extends View {
                 //记录是接受者取消的
                 cancelledPlayer = session.getSenderPlayer();
 
-                player.sendMessage("§c你已取消确认状态");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.cancel-ready"));
             }
         });
         cancelReadyButton.setOnClick(event -> {
@@ -215,7 +215,7 @@ public class TradeView extends View {
                 //清除记录
                 cancelledPlayer = null;
 
-                player.sendMessage("§c交易已取消，回到初始状态");
+                player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.trade-cancelled"));
             }
         });
     }
@@ -273,8 +273,8 @@ public class TradeView extends View {
         session.setConfirmed(true);
 
         // 交易成功提示（在关闭界面前发送，确保玩家能看到）
-        sender.sendMessage(GoodsTrade.PREFIX + "§a交易成功！");
-        receiver.sendMessage(GoodsTrade.PREFIX + "§a交易成功！");
+        sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.success"));
+        receiver.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.success"));
         sender.playSound(sender.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 1.0f, 1.5f);
         receiver.playSound(receiver.getLocation(), XSound.ENTITY_PLAYER_LEVELUP.get(), 1.0f, 1.5f);
 

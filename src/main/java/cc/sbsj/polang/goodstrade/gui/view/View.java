@@ -188,12 +188,12 @@ public class View {
         if (!GoodsTrade.config.isBlackList()) return false;
 
         if (GoodsTrade.config.isTradeLoreToBlackList(player)) {
-            player.sendMessage(GoodsTrade.PREFIX + "§c你的物品槽有禁止交易的物品！");
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.blacklist-hit"));
             event.setCancelled(true);
             return true;
         }
         if (GoodsTrade.config.isTradeNameToBlackList(player)) {
-            player.sendMessage(GoodsTrade.PREFIX + "§c你的物品槽有禁止交易的物品！");
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.blacklist-hit"));
             event.setCancelled(true);
             return true;
         }
