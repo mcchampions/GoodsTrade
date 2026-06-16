@@ -125,7 +125,6 @@ public class TradeView extends View {
                 if (session.bothReady()) {
                     prepareTrade(session);
                 }
-                //TODO
                 player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.confirm"));
             }
         });
@@ -134,7 +133,6 @@ public class TradeView extends View {
             if (player.equals(session.getSenderPlayer())) {
                 session.setSenderReady(false);
                 changeButtons(senderReadyButton, 48, 47, 46);
-                //TODO
                 player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.unconfirm"));
 
             }

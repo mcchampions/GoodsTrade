@@ -1,23 +1,18 @@
 package cc.sbsj.polang.goodstrade.config;
 
 import cc.sbsj.polang.goodstrade.GoodsTrade;
-import cc.sbsj.polang.goodstrade.gui.view.View;
-import cc.sbsj.polang.goodstrade.trade.TradeManager;
-import cc.sbsj.polang.goodstrade.trade.TradeSession;
-import cc.sbsj.polang.goodstrade.util.Utils;
+import cc.sbsj.polang.goodstrade.util.ItemBlackList;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.List;
 
 public class Config {
     private Configuration config;
+    private ItemBlackList itemBlackList;
 
     public Config(GoodsTrade plugin) {
         config = plugin.getConfig();
         plugin.saveDefaultConfig();
         ViewConfig.load(plugin);
+        loadItemBlackList();
     }
 
     public int getWaitTime() {
@@ -34,6 +29,7 @@ public class Config {
         config = GoodsTrade.instance.getConfig();
         ViewConfig.load(GoodsTrade.instance);
         GoodsTrade.lang.load();
+        loadItemBlackList();
     }
 
     public boolean isEnabledShiftClick() {
@@ -48,63 +44,11 @@ public class Config {
         return config.getBoolean("Trade.Safe.Move", false);
     }
 
-    public boolean isBlackList() {
-        return config.getBoolean("Trade.Item-BlackList.Enable", false);
+    public ItemBlackList getItemBlackList() {
+        return itemBlackList;
     }
 
-    public boolean isTradeLoreToBlackList(Player player) {
-        List<String> blackList = config.getStringList("Trade.Item-BlackList.Lore");
-        if (blackList.isEmpty()) return false;
-        TradeSession session = TradeManager.getSession(player);
-
-        if (session.getSenderPlayer() == player) {
-            return isLoreBlackList(View.senderTradeSlots, session, blackList);
-        } else {
-            return isLoreBlackList(View.targetTradeSlots, session, blackList);
-        }
-    }
-
-    public boolean isTradeNameToBlackList(Player player) {
-        List<String> blackList = config.getStringList("Trade.Item-BlackList.Name");
-        if (blackList.isEmpty()) return false;
-        TradeSession session = TradeManager.getSession(player);
-
-        if (session.getSenderPlayer() == player) {
-            return isNameBlackList(View.senderTradeSlots, session, blackList);
-        } else {
-            return isNameBlackList(View.targetTradeSlots, session, blackList);
-        }
-    }
-
-    private static boolean isNameBlackList(List<Integer> slots, TradeSession session, List<String> blackList) {
-        for (int i : slots) {
-            ItemStack item = session.getView().gui.getInventory().getItem(i);
-            if (!Utils.isItemStackNotEmpty(item)) continue;
-            if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-                for (String blackStr : blackList) {
-                    if (item.getItemMeta().getDisplayName().contains(blackStr)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private static boolean isLoreBlackList(List<Integer> slots, TradeSession session, List<String> blackList) {
-        for (int i : slots) {
-            ItemStack item = session.getView().gui.getInventory().getItem(i);
-            if (!Utils.isItemStackNotEmpty(item)) continue;
-            if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
-                for (String lore : item.getItemMeta().getLore()) {
-                    for (String blackStr : blackList) {
-                        if (lore.contains(blackStr)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+    private void loadItemBlackList() {
+        itemBlackList = ItemBlackList.fromConfig(config);
     }
 }

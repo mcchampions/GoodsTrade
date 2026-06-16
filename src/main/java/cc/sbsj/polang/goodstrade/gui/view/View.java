@@ -185,14 +185,7 @@ public class View {
     }
 
     public boolean isBlackList(InventoryClickEvent event, Player player) {
-        if (!GoodsTrade.config.isBlackList()) return false;
-
-        if (GoodsTrade.config.isTradeLoreToBlackList(player)) {
-            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.blacklist-hit"));
-            event.setCancelled(true);
-            return true;
-        }
-        if (GoodsTrade.config.isTradeNameToBlackList(player)) {
+        if (GoodsTrade.config.getItemBlackList().contains(player)) {
             player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-gui.blacklist-hit"));
             event.setCancelled(true);
             return true;
