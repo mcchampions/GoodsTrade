@@ -38,7 +38,7 @@ jobs:
           cat > .github/badges/lite-version.json <<EOF
           {
             "schemaVersion": 1,
-            "label": "Lite Version",
+            "label": "Lite 轻量版本",
             "message": "${{ steps.version.outputs.value }}",
             "color": "2ea44f"
           }
