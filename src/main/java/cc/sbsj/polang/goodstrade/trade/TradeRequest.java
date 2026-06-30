@@ -7,22 +7,26 @@ import java.util.UUID;
 
 public class TradeRequest {
     /**
-     * 发起者 ID
+     * -- GETTER --
+     *  获取发起者 ID
      */
     @Getter
     private final UUID senderId;
     /**
-     * 目标玩家 ID
+     * -- GETTER --
+     *  获取目标玩家 ID
      */
     @Getter
     private final UUID targetId;
     /**
-     * 发起者名字
+     * -- GETTER --
+     *  获取发起者名字
      */
     @Getter
     private final String senderName;
     /**
-     * 请求创建时间
+     * -- GETTER --
+     *  获取请求创建时间
      */
     @Getter
     private final long timestamp;

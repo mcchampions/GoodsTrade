@@ -1,24 +1,33 @@
-name: ${name}
-main: ${group}.${name}
-version: ${version}
-api-version: 1.13
+name: GoodsTrade
+version: '${version}'
+main: cc.sbsj.polang.goodstrade.GoodsTrade
 authors: [ polang ]
 description: 简单安全的玩家物品交易插件
 website: https://space.bilibili.com/450460661
-
-depend:
-  - NeigeItems
+api-version: '1.13'
+softdepend: [PlaceholderAPI]
 
 permissions:
-  ${name.toLowerCase()}.admin:
+  goodstrade.command.reload:
     default: op
-  ${name.toLowerCase()}.command.trade:
+    description: 重载插件
+  goodstrade.command.trade:
     default: op
-  ${name.toLowerCase()}.command.reload:
-    default: op
-  ${name.toLowerCase()}.command:
+    description: 指定两个玩家进行交易
+  goodstrade.command.sendtrade:
     default: true
-  ${name.toLowerCase()}.command.sendTrade:
+    description: 发送交易请求
+  goodstrade.command.accept:
     default: true
-  ${name.toLowerCase()}.command.accept:
+    description: 接受交易请求
+  goodstrade.command.toggle:
     default: true
+    description: 切换交易状态
+  goodstrade.command:
+    default: true
+    description: 使用命令的权限
+commands:
+  goodstrade:
+    permission: goodstrade.command
+    description: 交易功能主命令
+    aliases: [ gt ]

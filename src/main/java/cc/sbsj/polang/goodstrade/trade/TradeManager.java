@@ -1,32 +1,28 @@
 package cc.sbsj.polang.goodstrade.trade;
 
 import cc.sbsj.polang.goodstrade.GoodsTrade;
-import cc.sbsj.polang.goodstrade.action.ActionType;
 import cc.sbsj.polang.goodstrade.gui.view.TradeView;
-import cc.sbsj.polang.goodstrade.manager.ConfigManager;
-import lombok.val;
+import cc.sbsj.polang.goodstrade.util.Utils;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventPriority;
-import pers.neige.neigeitems.annotation.Awake;
-import pers.neige.neigeitems.annotation.CustomTask;
-import pers.neige.neigeitems.annotation.Schedule;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
 import static org.bukkit.event.inventory.InventoryCloseEvent.Reason.PLUGIN;
 
 public class TradeManager {
-    public static final Map<UUID, List<TradeRequest>> pendingRequests = new HashMap<>();
     private static final Map<UUID, TradeSession> sessions = new HashMap<>();
+    public static final Map<UUID, List<TradeRequest>> pendingRequests = new HashMap<>();
     private static final long DEFAULT_COOLDOWN = 30000; // 默认冷却 30 秒
 
 
     //创建交易
     public static TradeSession createSession(Player sender, Player target, TradeView view) {
-        val session = new TradeSession(sender, target, view);
+        TradeSession session = new TradeSession(sender, target, view);
 
         sessions.put(sender.getUniqueId(), session);
         sessions.put(target.getUniqueId(), session);
@@ -41,7 +37,7 @@ public class TradeManager {
     //删除双方交易状态
     public static void removeSession(Player player) {
         if (!isTrade(player)) return;
-        val otherPlayer = getOtherPlayer(player, sessions.get(player.getUniqueId()));
+        Player otherPlayer = getOtherPlayer(player, sessions.get(player.getUniqueId()));
         sessions.remove(otherPlayer.getUniqueId());
         //移除发起关闭的人
         sessions.remove(player.getUniqueId());
@@ -65,86 +61,114 @@ public class TradeManager {
 
     //完整的取消交易
     public static void cancelTrade(Player player) {
-        val session = TradeManager.getSession(player);
+        TradeSession session = TradeManager.getSession(player);
+        if (session == null) return;
 
-        val sender = session.getSenderPlayer();
+        Player sender = session.getSenderPlayer();
         session.getView().backPlayerItems(sender);
 
-        val target = session.getTargetPlayer();
+        Player target = session.getTargetPlayer();
         session.getView().backPlayerItems(target);
 
         if (session.isPlayerSender(player)) {
             //发起者结束交易
-            ActionType.YOU_CANCEL_TRADE.eval(player);
-            ActionType.TARGET_CANCEL_TRADE.eval(target);
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-self"));
+            target.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-other"));
             TradeManager.removeSession(player);
-            target.closeInventory();
+            // 手动处理光标物品后清空，防止 Bukkit closeInventory 内部重复返还
+            returnCursorItem(target);
+            target.closeInventory(PLUGIN);
         } else {
             //被发起者结束交易
-            ActionType.YOU_CANCEL_TRADE.eval(player);
-            ActionType.TARGET_CANCEL_TRADE.eval(sender);
+            player.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-self"));
+            sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-other"));
             TradeManager.removeSession(player);
-            sender.closeInventory();
+            returnCursorItem(sender);
+            sender.closeInventory(PLUGIN);
         }
     }
 
     //已经结束的取消交易
     //只需要关闭被交易者
     public static void cancelTrade(TradeSession session) {
-        val target = session.getTargetPlayer();
+        Player target = session.getTargetPlayer();
         TradeManager.removeSession(target);
         //必须先移除交易会话再关闭界面
-        target.closeInventory();
+        returnCursorItem(target);
+        target.closeInventory(PLUGIN);
+    }
+
+    /**
+     * 手动将光标物品放入玩家背包并清空光标，防止 closeInventory 内部重复返还
+     */
+    private static void returnCursorItem(Player player) {
+        ItemStack cursor = player.getOpenInventory().getCursor();
+        if (Utils.isItemStackNotEmpty(cursor)) {
+            Utils.addItems(player, cursor);
+        }
+        player.setItemOnCursor(null);
     }
 
     public static void startTrade(Player senderPlayer, Player targetPlayer) {
         if (!pendingRequests.containsKey(targetPlayer.getUniqueId())) {
-            ActionType.NO_REQUEST.eval(targetPlayer);
+            targetPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-request.no-pending"));
             return;
         }
-        ActionType.OPENING_TRADE_GUI.eval(senderPlayer);
-        ActionType.OPENING_TRADE_GUI.eval(targetPlayer);
+        senderPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.opening"));
+        targetPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.opening"));
         //打开界面后移除他俩的交易请求
         pendingRequests.remove(senderPlayer.getUniqueId());
         pendingRequests.remove(targetPlayer.getUniqueId());
-        val gui = new TradeView();
+        TradeView gui = new TradeView();
         gui.open(senderPlayer, targetPlayer);
     }
 
     public static void sendTradeRequest(Player senderPlayer, Player targetPlayer) {
+        // 检查目标玩家是否接受交易请求
+        if (!GoodsTrade.playerDataManager.isTradeAccept(targetPlayer.getUniqueId())) {
+            senderPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-request.target-closed"));
+            return;
+        }
+
         if (isInCooldown(senderPlayer, targetPlayer)) {
 //            long remainingSeconds = getRemainingCooldownSeconds(senderPlayer, targetPlayer);
-            ActionType.REQUEST_COOLDOWN.eval(senderPlayer);
+            senderPlayer.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-request.cooldown"));
             return;
         }
 
         addRequest(senderPlayer, targetPlayer);
 
-        val component = new TextComponent(ConfigManager.requestText.replace("<name>", senderPlayer.getName()));
+        String receivedMsg = GoodsTrade.lang.replacePlaceholders(
+                GoodsTrade.lang.getString("trade-request.received"),
+                "%player%", senderPlayer.getName()
+        );
+        BaseComponent component = new TextComponent(GoodsTrade.getPrefix() + receivedMsg);
         component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/goodstrade accept " + senderPlayer.getName()));
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("点击可确认")));
-        targetPlayer.spigot().sendMessage(component);
-        val params = new HashMap<String, Object>();
-        params.put("name", targetPlayer.getName());
-        ActionType.REQUEST_SENT.eval(senderPlayer, params);
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(GoodsTrade.lang.getString("trade-request.hover"))));
+        targetPlayer.sendMessage(component);
+        String sentMsg = GoodsTrade.lang.replacePlaceholders(
+                GoodsTrade.lang.getString("trade-request.sent"),
+                "%target%", targetPlayer.getName()
+        );
+        senderPlayer.sendMessage(GoodsTrade.getPrefix() + sentMsg);
     }
 
     private static void addRequest(Player sender, Player target) {
-        val targetId = target.getUniqueId();
-        val request = new TradeRequest(sender, target, DEFAULT_COOLDOWN);
+        UUID targetId = target.getUniqueId();
+        TradeRequest request = new TradeRequest(sender, target, DEFAULT_COOLDOWN);
 
         pendingRequests.computeIfAbsent(targetId, k -> new ArrayList<>()).add(request);
     }
 
     private static boolean isInCooldown(Player sender, Player target) {
-        val targetId = target.getUniqueId();
-        val requests = pendingRequests.get(targetId);
+        UUID targetId = target.getUniqueId();
+        List<TradeRequest> requests = pendingRequests.get(targetId);
 
         if (requests == null || requests.isEmpty()) {
             return false;
         }
 
-        for (val request : requests) {
+        for (TradeRequest request : requests) {
             if (request.isSameSender(sender) && !request.isExpired()) {
                 return true;
             }
@@ -176,13 +200,15 @@ public class TradeManager {
 //        return requests == null ? Collections.emptyList() : requests;
 //    }
 
-    @Schedule(period = 12000L)
+    /**
+     * 清理过期的请求
+     */
     public static void cleanupExpiredRequests() {
-        val iterator = pendingRequests.entrySet().iterator();
+        Iterator<Map.Entry<UUID, List<TradeRequest>>> iterator = pendingRequests.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            val entry = iterator.next();
-            val requests = entry.getValue();
+            Map.Entry<UUID, List<TradeRequest>> entry = iterator.next();
+            List<TradeRequest> requests = entry.getValue();
 
             requests.removeIf(TradeRequest::isExpired);
 
@@ -195,33 +221,32 @@ public class TradeManager {
     /**
      * 关闭所有正在交易的玩家界面并返还物品（用于 reload 或服务器关闭）
      */
-    @CustomTask(taskId = "reload", priority = EventPriority.LOW)
-    @Awake(lifeCycle = Awake.LifeCycle.DISABLE)
     public static void stopAllTrades() {
-        pendingRequests.clear();
         if (sessions.isEmpty()) return;
 
         // 复制一份避免并发修改异常
-//        List<TradeSession> sessionList = new ArrayList<>(sessions.values());
+        List<TradeSession> sessionList = new ArrayList<>(sessions.values());
 
-        for (val session : sessions.values()) {
+        for (TradeSession session : sessionList) {
             try {
-                val sender = session.getSenderPlayer();
-                val target = session.getTargetPlayer();
-                // 检查玩家是否在线
-                if (sender != null && target != null) {
-                    if (session.getView().runnable != null) session.getView().runnable.cancel();
-                    sender.closeInventory(PLUGIN);
-                    session.getView().backPlayerItems(sender); // 返还物品
-                    ActionType.CANCEL_BY_RELOAD.eval(sender);
-                    target.closeInventory(PLUGIN);
-                    session.getView().backPlayerItems(target); // 返还物品
-                    ActionType.CANCEL_BY_RELOAD.eval(target);
+                Player sender = session.getSenderPlayer();
+                Player target = session.getTargetPlayer();
+                if (session.getView().runnable != null) session.getView().runnable.cancel();
 
-                    TradeManager.removeSession(sender);
+                if (sender != null) {
+                    session.getView().backPlayerItems(sender);
+                    returnCursorItem(sender);
+                    sender.closeInventory(PLUGIN);
+                    sender.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-reload"));
+                }
+                if (target != null) {
+                    session.getView().backPlayerItems(target);
+                    returnCursorItem(target);
+                    target.closeInventory(PLUGIN);
+                    target.sendMessage(GoodsTrade.getPrefix() + GoodsTrade.lang.getString("trade-status.cancelled-by-reload"));
                 }
             } catch (Exception e) {
-                GoodsTrade.getInstance().getLogger().warning("关闭交易时发生错误：" + e.getMessage());
+                GoodsTrade.instance.getLogger().warning("关闭交易时发生错误：" + e.getMessage());
             }
         }
 
@@ -243,10 +268,10 @@ public class TradeManager {
     public static void cancelAllRequests(Player player) {
         pendingRequests.remove(player.getUniqueId());
 
-        val iterator = pendingRequests.entrySet().iterator();
+        Iterator<Map.Entry<UUID, List<TradeRequest>>> iterator = pendingRequests.entrySet().iterator();
         while (iterator.hasNext()) {
-            val entry = iterator.next();
-            val requests = entry.getValue();
+            Map.Entry<UUID, List<TradeRequest>> entry = iterator.next();
+            List<TradeRequest> requests = entry.getValue();
             requests.removeIf(req -> req.isSameSender(player));
 
             if (requests.isEmpty()) {

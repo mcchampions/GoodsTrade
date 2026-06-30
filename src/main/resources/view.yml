@@ -1,0 +1,29 @@
+button:
+  # 背景边框
+  "#":
+    #   每个按钮都可以配置以下字段：
+     material: black_stained_glass_pane # 物品材质，支持 XMaterial/Bukkit
+     name: "&7背景板"                    # 没有会使用默认名称
+     lore:                              # 不写会使用默认描述
+       - "&7"                           # 建议默认留一行，不然玩家拿普通玻璃板改个名可以把物品放进去或者有可能抠出来
+     custom_model_data: 0               # 资源包自定义模型数据，不写或 0 表示不设置
+  # 中间隔离板/提示物品
+  "@":
+#需要自定义就自己加
+#    material: iron_bars
+#    name: "中间提示"
+#    lore:
+#      - "&7提示信息"
+#    custom_model_data: 0
+
+  "F": # 发起者确认按钮
+
+  "F:Yes": # 发起者确认后
+
+  "T": # 接收者确认按钮
+
+  "T:Yes": # 接收者确认后
+
+  "Wait": # 双方同意后的倒计时按钮
+
+  "CancelReady": # 等待过程中有一方取消后的按钮
