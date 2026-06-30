@@ -22,12 +22,9 @@ dependencies {
     compileOnly(fileTree("libs"))
     // kotlin
     compileOnly(kotlin("stdlib"))
-    // jabel
-    annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:0.4.2")
-    compileOnly("com.github.bsideup.jabel:jabel-javac-plugin:0.4.2")
     annotationProcessor("net.java.dev.jna:jna-platform:5.13.0")
     // bukkit
-    compileOnly("com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     // ni
     compileOnly("pers.neige.neigeitems:NeigeItems:+")
     // multiple-string-searcher
@@ -64,23 +61,23 @@ tasks {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.compileJava {
-    sourceCompatibility = "17"
-    options.release = 8
+    sourceCompatibility = "21"
+    options.release = 21
     options.encoding = "UTF-8"
 
     javaCompiler = javaToolchains.compilerFor {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 tasks.compileKotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_1_8)
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
